@@ -8,11 +8,11 @@ from astropy import units as u
 import numpy as np
 
 # Import Poliastro libraries
-# ---- MODIFIED IMPORT ----
+# ---- FINAL CORRECTED IMPORTS ----
 from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 from poliastro.twobody import Orbit
-from poliastro.ephem import get_body_ephem  # <-- IMPORT THE OLDER FUNCTION
-# ---- END MODIFIED IMPORT ----
+from poliastro.io import get_horizons_vectors  # <-- THIS IS THE CORRECT FUNCTION TO IMPORT
+# ---- END FINAL CORRECTED IMPORTS ----
 
 # Import Plotly
 import plotly.graph_objects as go
@@ -45,12 +45,11 @@ def index():
             # Set the epoch (time of observation) to the current time
             epoch = Time.now()
 
-            # ---- FINAL CORRECTED SECTION for poliastro v0.17.0 ----
-            # In older versions, we first get the position (r) and velocity (v) vectors,
-            # and then create the Orbit object from those vectors.
-            r, v = get_body_ephem(planet, epoch)
-            orbit = Orbit.from_vectors(Sun, r, v, epoch=epoch)
-            # ---- END FINAL CORRECTED SECTION ----
+            # ---- FINAL CORRECTED ORBIT CREATION for poliastro v0.17.0 ----
+            # Use the correct function to get the Orbit object directly from JPL HORIZONS.
+            # This function requires an internet connection on the server, which Render provides.
+            orbit = get_horizons_vectors(planet, epoch)
+            # ---- END FINAL CORRECTED ORBIT CREATION ----
 
             # Create an array of time durations spanning one full orbital period.
             time_deltas = np.linspace(0 * u.s, orbit.period, 200)
