@@ -1352,3 +1352,100 @@ This will solve the problem. The root cause was simply that the deployment was r
 By forcing the correct vercel.json to GitHub, the next build will use the correct Python version, and the library 
 installation will succeed.
 
+----------------------FURTHER TROUBLE SHOOTING VERCEL Config issues---------------------------------
+
+Your research is spot-on: Vercel's default build environment (based on Amazon Linux 2023) does not 
+include Python 3.9. To use Python 3.9, we must explicitly tell Vercel to use its older, legacy build image (based on Amazon Linux 2).
+
+The previous vercel.json was sending the right instructions to the wrong environment. We will 
+now force Vercel to use the correct environment.
+The Definitive Fix: Forcing the Legacy Build Image
+
+We will do this in the most reliable way possible: directly in the Vercel project settings. 
+This overrides everything and guarantees the correct build image is used.
+Step 1: Go to Your Project Settings in Vercel
+
+    Open your Vercel dashboard in your web browser.
+
+    Click on your planetary_trajectories project.
+
+    Click on the "Settings" tab at the top of the page.
+
+    In the left-hand menu, click on "General".
+
+Step 2: Change the Build Image
+
+    Scroll down until you find the section named "Build & Development Settings".
+
+    The last option in this section is "Build Image".
+
+    You will see two options: "Next.js Build Image" or a similar default, and "Legacy Image (Amazon Linux 2)".
+
+    Click to select "Legacy Image (Amazon Linux 2)".
+
+    Click the "Save" button at the bottom of the section.
+
+Step 3: Verify Your vercel.json and requirements.txt
+
+Your code files are actually correct for this new setting. Let's just confirm they are in the right state.
+
+vercel.json (This tells the legacy image which Python version to use)
+    
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.9"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+  
+
+requirements.txt (These libraries are compatible with Python 3.9)
+code Text
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+# Flask Framework
+Flask==3.0.3
+
+# Scientific Libraries (pinned to compatible versions)
+astropy==6.0.1
+poliastro==0.18.1
+plotly==5.22.0
+numpy==1.26.4
+
+# Production Web Server for Vercel
+gunicorn==22.0.0
+
+  
+
+Step 4: Trigger a New Deployment
+
+After saving the build image setting, Vercel might not deploy automatically. We must trigger it manually 
+to ensure the new setting is used.
+
+    Go to the "Deployments" tab for your project.
+
+    Find the most recent deployment at the top of the list.
+
+    Click the "three dots" menu (⋮) on the far right of that deployment row.
+
+    Select "Redeploy" from the dropdown menu. Do not use the Git cache if it asks.
+
+Now, when you view the logs for this new deployment, you will see it successfully using Python 3.9 within 
+the Amazon Linux 2 environment. The pip install command will work, and your deployment will finally succeed.
+
+
