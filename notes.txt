@@ -1183,3 +1183,76 @@ What to Do Next
 
 This will instruct Vercel to install these exact library versions, which will allow pip to 
 find pre-compiled packages and avoid the build error. This should resolve the issue and get your application deployed successfully.
+
+
+BUG: json file syntax error:
+
+You've hit a very common and frustrating snag. My apologies for the trouble.
+
+This error, Error: Couldn't parse JSON file, is different from the previous ones. It's not a Python or a library error. 
+This error is coming from the Vercel command-line tool itself, and it means there is a small syntax 
+mistake inside your vercel.json file.
+
+JSON is a very strict format. A single misplaced comma, a missing quote, or an accidental character 
+can make the whole file invalid. This usually happens during a copy-paste.
+The Solution: Replace the File Content
+
+The easiest way to fix this is to completely replace the content of your vercel.json file with a clean, validated version.
+
+    Open your vercel.json file in your code editor.
+
+    Delete everything inside it. Make it a completely blank file.
+
+    Copy the code block below.
+
+    Paste it into the empty vercel.json file and save it.
+
+Here is the correct and syntactically valid content for your vercel.json:
+    
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.9"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+  
+
+How to Check for Errors Yourself (Future Tip)
+
+If this ever happens again with a JSON file, you can use an online "JSON validator".
+
+    Go to a website like JSONLint.
+
+    Copy the content of your .json file.
+
+    Paste it into the validator on the website.
+
+    Click "Validate JSON". It will immediately tell you if there is an error and often 
+    point to the exact line where the mistake is.
+
+After replacing the content with the clean version above, run the deploy command again from your terminal:
+code Bash
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+vercel --prod
+
+  
+
+The Vercel CLI should now be able to read the configuration file correctly, and your deployment will proceed.
+
+
