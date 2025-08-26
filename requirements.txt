@@ -2,9 +2,9 @@
 # Flask Framework
 Flask==3.0.3
 
-# Scientific Libraries (pinned for Python 3.10 compatibility)
+# Scientific Libraries (pinned to compatible versions)
 astropy==6.0.1
-poliastro==0.17.0
+poliastro==0.18.1
 plotly==5.22.0
 numpy==1.26.4
 
