@@ -8,8 +8,11 @@ from astropy import units as u
 import numpy as np
 
 # Import Poliastro libraries
+# ---- MODIFIED IMPORT ----
 from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 from poliastro.twobody import Orbit
+from poliastro.ephem import get_body_ephem  # <-- IMPORT THE OLDER FUNCTION
+# ---- END MODIFIED IMPORT ----
 
 # Import Plotly
 import plotly.graph_objects as go
@@ -42,30 +45,26 @@ def index():
             # Set the epoch (time of observation) to the current time
             epoch = Time.now()
 
-            # Create an Orbit object for the planet from its ephemeris data
-            orbit = Orbit.from_body_ephem(planet, epoch)
+            # ---- FINAL CORRECTED SECTION for poliastro v0.17.0 ----
+            # In older versions, we first get the position (r) and velocity (v) vectors,
+            # and then create the Orbit object from those vectors.
+            r, v = get_body_ephem(planet, epoch)
+            orbit = Orbit.from_vectors(Sun, r, v, epoch=epoch)
+            # ---- END FINAL CORRECTED SECTION ----
 
-            # ---- FINAL CORRECTED SECTION ----
-            # The 'propagate' method takes a time DURATION (a Quantity).
-            # To get a full trajectory, we must propagate the orbit over many small time steps.
-
-            # 1. Create an array of time durations spanning one full orbital period.
-            #    We use numpy's linspace to create 200 points for a smooth curve.
+            # Create an array of time durations spanning one full orbital period.
             time_deltas = np.linspace(0 * u.s, orbit.period, 200)
 
-            # 2. Loop through each time duration, call propagate() for that duration,
-            #    and store the resulting position vector (.r) of the new orbit.
+            # Loop through each time duration and propagate the orbit.
             positions = []
             for dt in time_deltas:
                 propagated_orbit = orbit.propagate(dt)
-                positions.append(propagated_orbit.r)  # .r is the position vector [x, y, z]
+                positions.append(propagated_orbit.r)
 
-            # 3. Unpack the list of position vectors into separate x, y, z lists for plotting.
-            #    The .value strips the units (e.g., km) to get raw numbers for Plotly.
+            # Unpack the position vectors into separate x, y, z lists for plotting.
             x_coords = [pos[0].to(u.km).value for pos in positions]
             y_coords = [pos[1].to(u.km).value for pos in positions]
             z_coords = [pos[2].to(u.km).value for pos in positions]
-            # ---- END FINAL CORRECTED SECTION ----
 
             # Create a 3D plot using Plotly
             fig = go.Figure()
