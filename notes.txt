@@ -908,3 +908,39 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+SHELL_OUTPUT:
+
+127.0.0.1 - - [25/Aug/2025 10:41:52] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:41:52] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:41:52] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+ * Detected change in 'C:\\Users\\Martin\\Documents\\Coding\\planetary_trajectories\\app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 596-014-203
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+127.0.0.1 - - [25/Aug/2025 10:44:32] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:44:32] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:44:52] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:44:53] "GET /static/style.css HTTP/1.1" 304 -
+C:\Python312\Lib\site-packages\erfa\core.py:133: ErfaWarning:
+
+ERFA function "taiutc" yielded 1 of "dubious year (Note 4)"
+
+127.0.0.1 - - [25/Aug/2025 10:45:09] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:45:10] "GET /static/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [25/Aug/2025 10:48:35] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:48:35] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:50:07] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:50:07] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:50:22] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:50:52] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:50:52] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:51:08] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:51:09] "GET /static/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [25/Aug/2025 10:52:36] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:52:36] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:55:12] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Aug/2025 10:55:12] "GET /static/style.css HTTP/1.1" 304 -
+
+
