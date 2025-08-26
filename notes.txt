@@ -1084,4 +1084,102 @@ What to Do Next
 This will instruct Vercel to install these exact library versions, which will allow pip to find 
 pre-compiled packages and avoid the build error. This should resolve the issue and get your application deployed successfully.
 
+VERCEL BUG 2:
 
+You have found the exact problem, and this error log is perfect. My apologies again; 
+this is a dependency conflict that is very common in Python deployments, and I should have anticipated it.
+The Root Cause of the Error
+
+The error log is telling us a very clear story:
+
+    Vercel is trying to use a new version of Python for your project (specifically, pip3.12 means Python 3.12).
+
+    The error message ERROR: Could not find a version that satisfies the requirement poliastro==0.18.1 and the long 
+    list of ignored versions show that the poliastro library is not compatible with Python 3.12. 
+    The latest compatible version it found required Python less than 3.11.
+
+This is a classic "library hasn't caught up with the new language version" problem.
+The Two-Step Solution
+
+We need to do two things:
+
+    Tell Vercel to use an older, more compatible version of Python.
+
+    Adjust poliastro to a version that is known to work with that older Python.
+
+Here are the exact changes for your files.
+Step 1: Modify vercel.json to Specify the Python Version
+
+We will add an engines block to your vercel.json file. This explicitly tells Vercel to use Python 3.10, 
+which is widely supported by scientific libraries.
+
+Replace the entire content of your vercel.json with this:
+
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.10"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+Change Explained: The new config block with "runtime": "python3.10" forces Vercel to use a different, more 
+compatible Python environment for your build.
+Step 2: Modify requirements.txt for Compatibility
+
+Now that we are using Python 3.10, we should use a version of poliastro that the error log confirmed is compatible. 
+Version 0.17.0 is the last one mentioned that works with Python < 3.11.
+
+Replace the entire content of your requirements.txt with this:
+
+  
+# Flask Framework
+Flask==3.0.3
+
+# Scientific Libraries (pinned for Python 3.10 compatibility)
+astropy==6.0.1
+poliastro==0.17.0
+plotly==5.22.0
+numpy==1.26.4
+
+# Production Web Server for Vercel
+gunicorn==22.0.0
+
+Change Explained: We have only changed poliastro==0.18.1 to poliastro==0.17.0.
+What to Do Next
+
+    Edit vercel.json and replace its content with the updated version above.
+
+    Edit requirements.txt and replace its content with the updated version above.
+
+    Commit and push both changed files to GitHub. Vercel will start a new deployment automatically. 
+    If using the CLI, run vercel --prod.
+
+This combination—forcing a specific, stable Python version and using a library version known to be compatible 
+with it—is the standard and correct way to solve this kind of deployment error. 
+This should lead to a successful build.
+
+What to Do Next
+
+    Open your requirements.txt file.
+
+    Delete all the old content.
+
+    Copy and paste the new, versioned content above into the file and save it.
+
+    Commit and push this change to GitHub. Vercel will automatically detect the new commit and start a new deployment. 
+    If you are using the Vercel CLI, run vercel --prod from your project folder again.
+
+This will instruct Vercel to install these exact library versions, which will allow pip to 
+find pre-compiled packages and avoid the build error. This should resolve the issue and get your application deployed successfully.
