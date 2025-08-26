@@ -944,3 +944,144 @@ ERFA function "taiutc" yielded 1 of "dubious year (Note 4)"
 127.0.0.1 - - [25/Aug/2025 10:55:12] "GET /static/style.css HTTP/1.1" 304 -
 
 
+
+MODIFICATIONS FOR VERCEL DEPLOYMENT:
+
+planetary_trajectories/
+|
+|-- app.py
+|-- requirements.txt   <-- YOU JUST CREATED THIS
+|-- vercel.json        <-- YOU JUST CREATED THIS
+|
+|-- templates/
+|   |-- index.html
+|   `-- layout.html
+|
+`-- static/
+    `-- style.css
+
+
+======requirements.txt======
+
+# Flask Framework
+Flask
+
+# Scientific Libraries
+astropy
+poliastro
+plotly
+numpy
+
+# Production Web Server for Vercel
+gunicorn
+
+
+======vercel.json======
+
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+What this file means:
+
+    "builds": "Take the file app.py and build it using Vercel's standard Python environment."
+
+    "routes": "Take any incoming request (/(.*)) and send it to the app.py function to be handled."
+
+What to Do Next
+
+    Create the two files as described above.
+
+    Verify your project structure. It must now look exactly like this:
+    code Code
+
+    IGNORE_WHEN_COPYING_START
+    IGNORE_WHEN_COPYING_END
+
+        
+    planetary_trajectories/
+    |
+    |-- app.py
+    |-- requirements.txt   <-- YOU JUST CREATED THIS
+    |-- vercel.json        <-- YOU JUST CREATED THIS
+    |
+    |-- templates/
+    |   |-- index.html
+    |   `-- layout.html
+    |
+    `-- static/
+        `-- style.css
+
+      
+
+    Deploy again. Commit and push these two new files to your GitHub repository. 
+    Vercel will see the new commit and automatically start a new deployment. Or, if you are using the Vercel CLI, 
+    run vercel --prod again from your project folder.
+
+With these two files in place, Vercel will now have all the instructions it needs to build 
+and deploy your application correctly. The 404 error should be resolved.
+
+DEBUGGING VERCEL ISSUE:
+
+Excellent, this error log is exactly what we needed. This is a classic and very common deployment issue, 
+so don't worry! My apologies for not providing the versioned file from the start.
+The Simple Explanation
+
+The error log shows that the installation of the astropy library is failing on Vercel's servers.
+
+This happens because when you don't specify an exact version for a library, pip tries to install the 
+absolute latest one. Sometimes, these latest versions require complex C code to be compiled from source during 
+installation. Vercel's standard Python build environment doesn't have all the necessary C compilers and system 
+tools to do this, so the build process for astropy fails.
+The Solution: Pinning Library Versions
+
+The solution is to be very specific in our requirements.txt file. We will "pin" each library to a specific 
+version that is known to be stable and, most importantly, has pre-compiled versions (called "wheels") available 
+that Vercel can download and install directly, skipping the entire fragile compilation step.
+
+Your Corrected requirements.txt
+
+Please replace the entire content of your requirements.txt file with the following. These versions are known 
+to be compatible with each other and work well in cloud deployment environments.
+
+MODIFIED requirements.txt:
+
+# Flask Framework
+Flask==3.0.3
+
+# Scientific Libraries (pinned to compatible versions)
+astropy==6.0.1
+poliastro==0.18.1
+plotly==5.22.0
+numpy==1.26.4
+
+# Production Web Server for Vercel
+gunicorn==22.0.0
+
+What to Do Next
+
+    Open your requirements.txt file.
+
+    Delete all the old content.
+
+    Copy and paste the new, versioned content above into the file and save it.
+
+    Commit and push this change to GitHub. Vercel will automatically detect the new commit and start a 
+    new deployment. If you are using the Vercel CLI, run vercel --prod from your project folder again.
+
+This will instruct Vercel to install these exact library versions, which will allow pip to find 
+pre-compiled packages and avoid the build error. This should resolve the issue and get your application deployed successfully.
+
+
