@@ -1251,8 +1251,104 @@ IGNORE_WHEN_COPYING_END
     
 vercel --prod
 
-  
-
 The Vercel CLI should now be able to read the configuration file correctly, and your deployment will proceed.
 
+**TROUBLESHOOTING**
+
+The log provides the critical clue. Please look at the first line of the error:
+
+Failed to run "pip3.12 install ..."
+
+This means that Vercel is still trying to use Python 3.12 to build your project. This is the entire problem. 
+It confirms that your change in the vercel.json file (telling Vercel to use Python 3.9) is not being applied 
+to this specific deployment.
+
+There are only two possible reasons for this:
+
+    The vercel.json file change was not saved correctly before being committed.
+
+    The change was not correctly pushed to the main branch of your GitHub repository that Vercel is watching.
+
+Let's fix this once and for all. We will be extra thorough.
+The Definitive 3-Step Fix
+Step 1: Verify the vercel.json File Content
+
+Open your vercel.json file one last time and ensure it looks exactly like this. The "config" section 
+is the most important part.
+
+    
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.9"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
+
+  
+
+Step 2: Force Push the Changes with Git
+
+Open your terminal in the project folder and run these three commands in order. This will guarantee that your local 
+changes are sent to GitHub and Vercel.
+
+    Add all changes to Git:
+    code Bash
+
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+git add vercel.json requirements.txt
+```    *(This command stages both files, just to be safe)*
+
+  
+
+Commit the changes with a clear message:
+code Bash
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+git commit -m "Force Python 3.9 and pin dependencies"
+
+  
+
+Push the commit to your GitHub repository:
+code Bash
+
+    IGNORE_WHEN_COPYING_START
+    IGNORE_WHEN_COPYING_END
+
+        
+    git push
+
+      
+
+Step 3: Verify and Redeploy on Vercel
+
+    Check GitHub: Open your repository on the GitHub website. Look at the vercel.json file there. 
+    You should see the "pythonVersion": "3.9" line. If you see it, you have succeeded.
+
+    Redeploy on Vercel: Go to your Vercel dashboard. A new deployment should have started automatically 
+    after you pushed the changes. If not, go to your project -> Deployments tab -> click the "..." menu on your 
+    latest commit and choose "Redeploy".
+
+    Check the New Logs: Click on this new deployment and watch the logs. The very first lines should now show 
+    something about Python 3.9. The pip command will now be pip3.9 install... instead of pip3.12 install....
+
+This will solve the problem. The root cause was simply that the deployment was running with old settings. 
+By forcing the correct vercel.json to GitHub, the next build will use the correct Python version, and the library 
+installation will succeed.
 
