@@ -8,7 +8,7 @@ from astropy import units as u
 import numpy as np
 
 # Import Poliastro libraries
-from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
+from poliastro.bodies import Sun
 from poliastro.twobody import Orbit
 from poliastro.ephem import Ephem
 
@@ -17,16 +17,20 @@ import plotly.graph_objects as go
 
 app = Flask(__name__)
 
-PLANETS = {
-    "Mercury": Mercury,
-    "Venus": Venus,
-    "Earth": Earth,
-    "Mars": Mars,
-    "Jupiter": Jupiter,
-    "Saturn": Saturn,
-    "Uranus": Uranus,
-    "Neptune": Neptune,
+# ---- FINAL FIX: Use specific JPL HORIZONS IDs instead of names ----
+# This dictionary maps the user-friendly name to the official ID required by the NASA API.
+# This completely removes the "Ambiguous target name" error.
+PLANET_IDS = {
+    "Mercury": "199",
+    "Venus": "299",
+    "Earth": "399",
+    "Mars": "499",
+    "Jupiter": "599",  # Use the specific ID for the planet
+    "Saturn": "699",   # Use the specific ID for the planet
+    "Uranus": "799",
+    "Neptune": "899",
 }
+# ---- END FINAL FIX ----
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -36,17 +40,16 @@ def index():
     plot_div = None
     if request.method == 'POST':
         planet_name = request.form.get('planet')
-        if planet_name in PLANETS:
-            # Get the planet object from poliastro
-            planet = PLANETS[planet_name]
+        if planet_name in PLANET_IDS:
+            # Get the specific ID for the selected planet
+            planet_id = PLANET_IDS[planet_name]
 
             # Set the epoch (time of observation) to the current time
             epoch = Time.now()
 
             # ---- FINAL, VERIFIED ORBIT CREATION ----
-            # 1. Fetch the ephemeris data from NASA JPL HORIZONS.
-            #    We add id_type='majorbody' to resolve ambiguity for planets like Jupiter.
-            ephem = Ephem.from_horizons(planet.name, epochs=epoch, id_type='majorbody')
+            # 1. Fetch the ephemeris data from NASA using the specific, unambiguous ID.
+            ephem = Ephem.from_horizons(planet_id, epochs=epoch)
 
             # 2. Create the Orbit object using this special Ephem object.
             orbit = Orbit.from_ephem(Sun, ephem, epoch=epoch)
@@ -75,7 +78,7 @@ def index():
                 y=y_coords,
                 z=z_coords,
                 mode='lines',
-                name=planet.name,
+                name=planet_name,
                 line=dict(width=4)
             ))
 
@@ -89,7 +92,7 @@ def index():
 
             # Update the layout of the plot
             fig.update_layout(
-                title=f"Trajectory of {planet.name} (around the current date)",
+                title=f"Trajectory of {planet_name} (around the current date)",
                 scene=dict(
                     xaxis_title="X (km)",
                     yaxis_title="Y (km)",
@@ -101,7 +104,8 @@ def index():
 
             plot_div = fig.to_html(full_html=False)
 
-    return render_template('index.html', plot_div=plot_div, planets=PLANETS.keys())
+    # Pass the keys of the ID dictionary to the template for the dropdown menu
+    return render_template('index.html', plot_div=plot_div, planets=PLANET_IDS.keys())
 
 if __name__ == '__main__':
     app.run(debug=True)
