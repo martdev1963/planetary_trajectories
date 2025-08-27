@@ -11,7 +11,8 @@ import numpy as np
 # ---- FINAL, VERIFIED IMPORTS for v0.17.0 ----
 from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 from poliastro.twobody import Orbit
-# ---- No other poliastro imports are needed ----
+from poliastro.ephem import Ephem  # <-- Import the Ephem class
+# ---- END FINAL, VERIFIED IMPORTS ----
 
 # Import Plotly
 import plotly.graph_objects as go
@@ -45,9 +46,13 @@ def index():
             epoch = Time.now()
 
             # ---- FINAL, VERIFIED ORBIT CREATION ----
-            # This is the correct method for poliastro v0.17.0.
-            # It's a class method on the Orbit object itself.
-            orbit = Orbit.from_ephem(Sun, planet, epoch=epoch)
+            # 1. Fetch the ephemeris data for the planet from NASA JPL HORIZONS.
+            #    This creates a special Ephem object that holds the planet's state (position & velocity).
+            ephem = Ephem.from_horizons(planet, epochs=epoch)
+
+            # 2. Create the Orbit object using this special Ephem object.
+            #    This is the correct way to use this function.
+            orbit = Orbit.from_ephem(Sun, ephem, epoch=epoch)
             # ---- END FINAL, VERIFIED ORBIT CREATION ----
 
             # Create an array of time durations spanning one full orbital period.
