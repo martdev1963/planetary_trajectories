@@ -45,8 +45,8 @@ def index():
 
             # ---- FINAL, VERIFIED ORBIT CREATION ----
             # 1. Fetch the ephemeris data from NASA JPL HORIZONS.
-            #    We pass the planet's name (e.g., "Mercury") to avoid malformed requests.
-            ephem = Ephem.from_horizons(planet.name, epochs=epoch) # <-- THE ONLY CHANGE IS .name
+            #    We add id_type='majorbody' to resolve ambiguity for planets like Jupiter.
+            ephem = Ephem.from_horizons(planet.name, epochs=epoch, id_type='majorbody')
 
             # 2. Create the Orbit object using this special Ephem object.
             orbit = Orbit.from_ephem(Sun, ephem, epoch=epoch)
