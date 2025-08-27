@@ -8,11 +8,9 @@ from astropy import units as u
 import numpy as np
 
 # Import Poliastro libraries
-# ---- FINAL, VERIFIED IMPORTS for v0.17.0 ----
 from poliastro.bodies import Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune
 from poliastro.twobody import Orbit
-from poliastro.ephem import Ephem  # <-- Import the Ephem class
-# ---- END FINAL, VERIFIED IMPORTS ----
+from poliastro.ephem import Ephem
 
 # Import Plotly
 import plotly.graph_objects as go
@@ -46,12 +44,11 @@ def index():
             epoch = Time.now()
 
             # ---- FINAL, VERIFIED ORBIT CREATION ----
-            # 1. Fetch the ephemeris data for the planet from NASA JPL HORIZONS.
-            #    This creates a special Ephem object that holds the planet's state (position & velocity).
-            ephem = Ephem.from_horizons(planet, epochs=epoch)
+            # 1. Fetch the ephemeris data from NASA JPL HORIZONS.
+            #    We pass the planet's name (e.g., "Mercury") to avoid malformed requests.
+            ephem = Ephem.from_horizons(planet.name, epochs=epoch) # <-- THE ONLY CHANGE IS .name
 
             # 2. Create the Orbit object using this special Ephem object.
-            #    This is the correct way to use this function.
             orbit = Orbit.from_ephem(Sun, ephem, epoch=epoch)
             # ---- END FINAL, VERIFIED ORBIT CREATION ----
 
