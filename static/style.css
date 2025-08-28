@@ -45,3 +45,13 @@ button:hover {
 .plot {
     margin-top: 20px;
 }
+
+/* Footer Styles */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+    font-size: 0.9em;
+    color: #777;
+}
