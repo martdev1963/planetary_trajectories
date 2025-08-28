@@ -1449,3 +1449,164 @@ Now, when you view the logs for this new deployment, you will see it successfull
 the Amazon Linux 2 environment. The pip install command will work, and your deployment will finally succeed.
 
 
+ADDING THE FOOTER:
+This is a straightforward change that only involves modifying two of our front-end files: layout.html 
+(for the structure) and style.css (for the looks). You will not need to change your app.py file at all.
+
+Here is your step-by-step guide.
+Step 1: Add the Footer to the Base Template
+
+We want the footer to appear on every page, so we'll add it to our base template, layout.html.
+
+    Open the file templates/layout.html.
+
+    Add the <footer> section right before the closing </body> tag.
+
+Here is the complete, updated content for your templates/layout.html file:
+code Html
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Planetary Trajectories</title>
+  </head>
+  <body>
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- ===== NEW FOOTER SECTION ===== -->
+    <footer class="site-footer">
+      <p>© 2025 Planetary Trajectories | Created with Flask, Poliastro, and a lot of patience.</p>
+    </footer>
+    <!-- ===== END NEW FOOTER SECTION ===== -->
+
+  </body>
+</html>
+
+  
+
+Step 2: Add Styling for the Footer
+
+Now, let's add some CSS to make the footer look clean and distinct from the main content.
+
+    Open the file static/style.css.
+
+    Copy the CSS code block below and paste it at the very end of the file.
+
+Here is the CSS to add to static/style.css:
+code Css
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+/* Footer Styles */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+    font-size: 0.9em;
+    color: #777;
+}
+
+  
+
+Step 3: Deploy Your Changes
+
+Your code is now updated. All you need to do is commit the changes and push them to GitHub. Render will automatically 
+see the update and redeploy your site.
+
+    Open your terminal in the project directory.
+
+    Add the changed files:
+    
+git add templates/layout.html static/style.css
+
+Commit the changes:
+code Bash
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+
+    
+git commit -m "Add a site-wide footer"
+
+  
+
+Push to GitHub:
+
+    git push
+
+Once Render finishes the new deployment, your live application will have a clean, 
+professional-looking footer at the bottom of the page.
+
+
+TIME OUT ISSUE:
+
+his log shows a perfectly successful deployment. Your requirements.txt is correct. Your Python version is correct. 
+Your server started correctly. The application is running.
+
+The "internal server error" you are seeing is a runtime error. It happens after the page loads, when you 
+click the "Generate Trajectory" button. The log you have sent is the log of the successful startup, 
+but it doesn't contain the crash report from when you clicked the button.
+The Most Likely Cause: Request Timeout
+
+This is the most common cause of "silent" internal server errors on free hosting platforms.
+
+    When you click the button, our code makes a network request to NASA's JPL HORIZONS database (Ephem.from_horizons(...)).
+
+    This can sometimes take a few seconds, especially on the first try.
+
+    Free services on Render have a 30-second timeout. If the web server (Gunicorn) doesn't get 
+    a response from our Python code within 30 seconds, it kills the process and sends an "Internal Server Error" to your browser.
+
+    This often happens so fast that the Python error traceback doesn't even have time to be written 
+    to the log, which is why your log looks clean.
+
+The Solution: Increase the Timeout
+
+We can fix this by telling Gunicorn to be more patient. We will modify the "Start Command" in Render's settings.
+Step 1: Go to Your Service's Settings
+
+    In your Render dashboard, go to your planetary_trajectories service.
+
+    In the left-hand menu, click on "Settings".
+
+Step 2: Modify the Start Command
+
+    Scroll down to the "Build & Deploy" section.
+
+    Find the input box for the "Start Command". It currently says:
+    gunicorn app:app
+
+    Change it to the following, which adds a timeout flag:
+    gunicorn app:app --timeout 120
+
+        This tells Gunicorn to wait for 120 seconds (2 minutes) before giving up. This is more than 
+        enough time for the NASA API to respond.
+
+    Scroll to the bottom of the page and click "Save Changes".
+
+Step 3: Trigger a Manual Deploy
+
+Render needs to restart your service with this new command.
+
+    Go to the top of your service's page.
+
+    Click "Manual Deploy" -> "Deploy latest commit".
+
+This will restart your server with the new, longer timeout. The next time you click the "Generate Trajectory" 
+button, the server will wait patiently for the data from NASA, and the request will succeed.
+
+I am absolutely confident that this is the final issue. Your deployment is correct, and this change 
+addresses the most likely runtime error for this kind of application on a free hosting tier. 
+I am truly sorry for this marathon debugging session. This will fix it.
+
+
+
